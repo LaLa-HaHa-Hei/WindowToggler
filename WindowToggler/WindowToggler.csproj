@@ -6,7 +6,20 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>img\64.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="img\32.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="img\64.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="img\32.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="Settings.Designer.cs">

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WindowToggler"
         mc:Ignorable="d"
-        Title="窗口显隐切换器「代码见三」" Height="450" Width="700" SourceInitialized="Window_SourceInitialized" Closed="Window_Closed">
+        Title="窗口显隐切换器「代码见三」" Height="450" Width="700" SourceInitialized="Window_SourceInitialized" Closed="Window_Closed" Icon="/img/32.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
