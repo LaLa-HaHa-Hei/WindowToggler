@@ -1,0 +1,121 @@
+﻿<Window x:Class="WindowToggler.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WindowToggler"
+        mc:Ignorable="d"
+        Title="窗口显隐切换器「代码见三」" Height="450" Width="700" SourceInitialized="Window_SourceInitialized" Closed="Window_Closed">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 菜单栏 -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="帮助">
+                <MenuItem x:Name="AboutMenuItem" Header="关于" Click="AboutMenuItem_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <!--窗口列表-->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" SharedSizeGroup="ListViewGroup"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="1*" SharedSizeGroup="ListViewGroup"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 所有窗口列表 -->
+            <ListView x:Name="AllWindowsListView" Grid.Column="0">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="AddWindowMenuItem" Header="添加" Click="AddWindowMenuItem_Click"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="可视" Width="Auto" DisplayMemberBinding="{Binding IsVisibleText}"/>
+                        <GridViewColumn Header="窗口名" DisplayMemberBinding="{Binding Title}" Width="200"/>
+                        <GridViewColumn Header="窗口句柄" DisplayMemberBinding="{Binding Handle}"/>
+                        <GridViewColumn Header="PID" DisplayMemberBinding="{Binding PID}"/>
+                        <GridViewColumn Header="程序路径" DisplayMemberBinding="{Binding AppPath}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <!--操作窗口区-->
+            <StackPanel Grid.Column="1" Width="90" VerticalAlignment="Top" Margin="0,20,0,0">
+                <Button x:Name="RefreshWindowListButton" Content="刷新列表" Click="RefreshWindowListButton_Click"/>
+                <Button x:Name="AddWindowButton" Content="添加窗口→" Margin="0,10,0,0" Click="AddWindowButton_Click"/>
+                <Button x:Name="RemoveWindowButton" Content="←移除窗口" Margin="0,10,0,0" Click="RemoveWindowButton_Click"/>
+                <Button x:Name="RemoveAllWindowButton" Content="←全部清空" Margin="0,10,0,0" Click="RemoveAllWindowButton_Click"/>
+                <CheckBox x:Name="ListInvisibleWindowCheckBox" Content="不可视窗口" Margin="0,10,0,0" />
+                <CheckBox x:Name="ListUntitledWindowCheckBox" Content="无标题窗口" Margin="0,10,0,0" />
+                <CheckBox x:Name="ListUnableWindowCheckBox" Content="未启用窗口" Margin="0,10,0,0" />
+                <TextBlock Text="以管理员身份运行将能操作更多窗口" Margin="0,10,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <!-- 目标窗口列表 -->
+            <ListView x:Name="TargetWindowsListView" Grid.Column="2">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="RemoveTargetWindowMenuItem" Header="移除" Click="RemoveTargetWindowMenuItem_Click"/>
+                        <MenuItem x:Name="ShowTargetWindowMenuItem" Header="显示" Click="ShowTargetWindowMenuItem_Click"/>
+                        <MenuItem x:Name="HideTargetWindowMenuItem" Header="隐藏" Click="HideTargetWindowMenuItem_Click"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="目标窗口名" Width="Auto" DisplayMemberBinding="{Binding Title}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        
+        <!--控制区-->
+        <StackPanel Grid.Row="2">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,10,10,0">
+                <CheckBox x:Name="UseHotKeyCheckBox" Content="按下热键隐藏" Checked="UseHotKeyCheckBox_Checked" Unchecked="UseHotKeyCheckBox_Unchecked"/>
+                <ComboBox x:Name="ModifierKey1ComboBox" Margin="10,0,0,0" SelectionChanged="HideWindowHotKey_SelectionChanged" />
+                <TextBlock Text="+"/>
+                <ComboBox  x:Name="ModifierKey2ComboBox" SelectionChanged="HideWindowHotKey_SelectionChanged"/>
+                <TextBlock Text="+"/>
+                <ComboBox  x:Name="ModifierKey3ComboBox" SelectionChanged="HideWindowHotKey_SelectionChanged"/>
+                <TextBlock Text="+"/>
+                <ComboBox  x:Name="VirtualKeyComboBox" SelectionChanged="HideWindowHotKey_SelectionChanged"/>
+                <TextBlock Text="无先后顺序，相同的Alt/Shift/Ctrl将合并为一个"/>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,10,10,0">
+                <CheckBox x:Name="UseMiddleButtonDownCheckBox" Content="按下鼠标滚轮隐藏" Unchecked="UseMiddleButtonDownCheckBox_Unchecked" Checked="UseMiddleButtonDownCheckBox_Checked"/>
+                <CheckBox x:Name="UseSimultaneousLeftRightDownCheckBox" Content="同时按下鼠标左右键隐藏" Margin="10,0,0,0" Checked="UseSimultaneousLeftRightDownCheckBox_Checked" Unchecked="UseSimultaneousLeftRightDownCheckBox_Unchecked"/>
+                <CheckBox x:Name="UseMouseMoveOutCheckBox" Content="鼠标移出目标窗口隐藏" Margin="10,0,0,0" Checked="UseMouseMoveOutCheckBox_Checked" Unchecked="UseMouseMoveOutCheckBox_Unchecked"/>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,10,10,10">
+                <CheckBox x:Name="UseHideThisAppHotKeyCheckBox" Content="隐藏本程序窗口" Checked="UseHideThisAppHotKeyCheckBox_Checked" Unchecked="UseHideThisAppHotKeyCheckBox_Unchecked" />
+                <ComboBox x:Name="ThisModifierKey1ComboBox" Margin="10,0,0,0" SelectionChanged="HideThisAppHotKey_SelectionChanged" />
+                <TextBlock Text="+"/>
+                <ComboBox x:Name="ThisModifierKey2ComboBox" SelectionChanged="HideThisAppHotKey_SelectionChanged" />
+                <TextBlock Text="+"/>
+                <ComboBox x:Name="ThisModifierKey3ComboBox" SelectionChanged="HideThisAppHotKey_SelectionChanged" />
+                <TextBlock Text="+"/>
+                <ComboBox x:Name="ThisVirtualKeyComboBox" SelectionChanged="HideThisAppHotKey_SelectionChanged" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- 状态栏 -->
+        <StatusBar Grid.Row="3">
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock>
+                    GitHub：
+                    <Hyperlink NavigateUri="https://github.com/LaLa-HaHa-Hei/WindowToggler" Click="Hyperlink_Click">
+    https://github.com/LaLa-HaHa-Hei/WindowToggler
+</Hyperlink>
+                </TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
