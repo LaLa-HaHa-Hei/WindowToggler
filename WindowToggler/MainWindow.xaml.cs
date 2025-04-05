@@ -145,6 +145,7 @@ public partial class MainWindow : Window
     {
         _allWindowList.Clear();
         _ = NativeMethods.EnumWindows(EnumWindowsProc, IntPtr.Zero);
+        _targetAppList.Clear();
     }
     // 刷新目标窗口列表，删除失效窗口，更新标题
     private void RefreshTargetWindowsListView()
