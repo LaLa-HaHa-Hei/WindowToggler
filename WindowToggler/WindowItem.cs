@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -18,6 +20,8 @@ namespace WindowToggler
             public static extern bool ShowWindow(IntPtr hWnd, uint nCmdShow);
             [DllImport("user32.dll")]
             public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);
+            [DllImport("user32.dll")]
+            public static extern bool GetWindowPlacement(IntPtr hWnd, out WINDOWPLACEMENT lpwndpl);
 
             private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
 
@@ -28,6 +32,22 @@ namespace WindowToggler
                 public int Top;
                 public int Right;
                 public int Bottom;
+            }
+            [StructLayout(LayoutKind.Sequential)]
+            public struct WINDOWPLACEMENT
+            {
+                public int length;
+                public int flags;
+                public int showCmd;
+                public POINT ptMinPosition;
+                public POINT ptMaxPosition;
+                public RECT rcNormalPosition;
+            }
+            [StructLayout(LayoutKind.Sequential)]
+            public struct POINT
+            {
+                public int x;
+                public int y;
             }
 
             public const uint SW_HIDE = 0;
@@ -91,7 +111,14 @@ namespace WindowToggler
 
         public Rect GetWindowRect()
         {
-            NativeMethods.GetWindowRect(Handle, out NativeMethods.RECT rect);
+            NativeMethods.GetWindowPlacement(Handle, out NativeMethods.WINDOWPLACEMENT placement);
+            var rect = placement.rcNormalPosition;
+            //NativeMethods.GetWindowRect(Handle, out NativeMethods.RECT rect);
+            //if (rect.Left < 0 || rect.Top < 0 || rect.Right < 0 || rect.Bottom < 0)
+            //{
+            //    NativeMethods.GetWindowPlacement(Handle, out NativeMethods.WINDOWPLACEMENT placement);
+            //    rect = placement.rcNormalPosition;
+            //}
             return new Rect(rect.Left, rect.Top, rect.Right, rect.Bottom);
         }
     }
